@@ -1,5 +1,5 @@
 import React,{createContext,useCallback,useContext,useEffect,useMemo,useState} from 'react';
-import {catalog:baseCatalog,getTitle} from '../data/catalog.js';
+import {catalog as baseCatalog,getTitle} from '../data/catalog.js';
 import {defaultProfiles} from '../data/profiles.js';
 import {loadJSON,saveJSON} from '../lib/storage.js';
 import {controlBus} from '../lib/controlBus.js';
