@@ -15,5 +15,10 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Validate support scripts
+        run: |
+          node --check server/control-server.mjs
+          bash -n scripts/pi/start-notflix.sh
+          bash -n scripts/pi/cec-remote.sh
       - run: npm test
       - run: npm run build
