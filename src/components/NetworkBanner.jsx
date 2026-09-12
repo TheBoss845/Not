@@ -1,0 +1,3 @@
+import React,{useEffect,useState} from 'react';
+import {WifiOff} from 'lucide-react';
+export default function NetworkBanner(){const[online,setOnline]=useState(()=>navigator.onLine);useEffect(()=>{const on=()=>setOnline(true),off=()=>setOnline(false);window.addEventListener('online',on);window.addEventListener('offline',off);return()=>{window.removeEventListener('online',on);window.removeEventListener('offline',off);};},[]);if(online)return null;return <div className="network-banner"><WifiOff size={17}/><span>You’re offline. Cached NOTFLIX still works; remote control and new media may not.</span></div>;}

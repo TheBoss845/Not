@@ -1,23 +1,16 @@
 # NOTFLIX
 
-A TV-first parody streaming platform for original comedy trailers, fake catalog entries, custom episodes, and interactive prank moments.
+A TV-first parody streaming platform for original comedy trailers, fake catalog entries, generated short films, and interactive prank moments on devices you are allowed to use.
 
-## Implemented
+## Platform status
 
-- cinematic boot sequence and profile picker
-- persistent profiles, My List, Continue Watching, watch progress, history, settings, and notifications
-- Home, TV Shows, Movies, New & Popular, and My List views
-- large parody catalog with movies and multi-season shows
-- Top 10, New Releases, recommendations, genre rows, and injected titles
-- delayed expanding cards and keyboard/TV focus navigation
-- title detail experience with seasons, episodes, metadata, recommendations, and play controls
-- fullscreen player with play/pause, seek, mute, subtitles, progress, fullscreen, and autoplay-next
-- support for real media URLs plus cinematic simulated playback while media is still being produced
-- search overlay
-- Premium Pause, Premium Rewind, fake buffering, fake errors, subtitle jokes, and reveal pranks
-- NOTFLIX HQ control room
-- local BroadcastChannel control plus optional WebSocket relay for another device
-- PWA shell and Raspberry Pi kiosk starter
+The app now includes a cinematic boot experience, multi-profile picker, Home / Movies / TV / New & Popular / My List surfaces, search, notifications, persistent watch history and progress, genre filtering, title detail pages, seasons and episodes, autoplay previews, actual-video and simulated playback, captions, playback speed, skip-intro support, autoplay-next, keyboard/TV navigation, offline shell, and persistent settings.
+
+NOTFLIX HQ includes live playback telemetry, transport controls, instant prank triggers, catalog injection, a catalog studio for adding generated movies without editing code, per-title prank rule editing, and an event log. Local tabs use BroadcastChannel; the optional relay server supports a phone/iPad controller and TV viewer on the same permitted setup.
+
+## Media pipeline
+
+Each title can provide `media.source`, `media.trailer`, `media.poster`, `media.backdrop`, subtitle tracks, and an intro endpoint. If media is missing, NOTFLIX deliberately falls back to polished simulated artwork/playback so the catalog is still usable while films are being produced. Add original, licensed, or otherwise permitted media only.
 
 ## Run
 
@@ -26,14 +19,16 @@ npm install
 npm run dev
 ```
 
-Optional control relay:
+## Validate
 
 ```bash
-NOTFLIX_CONTROL_TOKEN=choose-a-token npm run control
+npm run check
 ```
 
-Open HQ with `/?mode=hq&skipBoot=1` or press `Shift + P`.
+## Raspberry Pi / TV
 
-## Media rule
+See `docs/PI_KIOSK.md`. The supplied kiosk starter launches Chromium fullscreen; arrow keys, Enter, Escape/Backspace, and compatible remote-key translation drive the TV interface.
 
-Use original, licensed, or otherwise permitted media. This project is for a parody streaming experience, not redistributing copyrighted movies.
+## Hidden control surface
+
+Open with `?mode=hq` or press `Shift + P`. Keep HQ on a device you control. The prank system is intended for harmless jokes, not secret access to somebody else’s hardware or accounts.
