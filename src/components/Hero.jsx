@@ -5,8 +5,9 @@ import FocusButton from './FocusButton.jsx';
 import Artwork from './Artwork.jsx';
 
 export default function Hero({item,onPlay,onInfo}){
-  const{settings}=useNotflix();const[muted,setMuted]=useState(true);const[previewing,setPreviewing]=useState(false);const videoRef=useRef(null);
-  useEffect(()=>{setPreviewing(false);if(!settings.autoplayPreviews)return undefined;const id=setTimeout(()=>setPreviewing(true),1600);return()=>clearTimeout(id);},[item?.id,settings.autoplayPreviews]);
+  const{settings,profile}=useNotflix();const[muted,setMuted]=useState(true);const[previewing,setPreviewing]=useState(false);const videoRef=useRef(null);
+  const autoplay=settings.autoplayPreviews&&profile?.autoplay!==false;
+  useEffect(()=>{setPreviewing(false);if(!autoplay)return undefined;const id=setTimeout(()=>setPreviewing(true),1600);return()=>clearTimeout(id);},[item?.id,autoplay]);
   useEffect(()=>{if(videoRef.current)videoRef.current.muted=muted;},[muted]);
   if(!item)return null;
   return <section className={`hero ${previewing?'hero--previewing':''}`}><div className="hero__visual"><Artwork item={item} variant="hero" previewing={previewing}/>{previewing&&item.media?.trailer&&<video ref={videoRef} className="hero__video" src={item.media.trailer} autoPlay muted={muted} loop playsInline/>}</div><div className="hero__vignette"/>
