@@ -1,0 +1,17 @@
+import React,{useEffect,useMemo,useState} from 'react';
+import {baseRows,navFilters} from '../data/rows.js';
+import {useNotflix} from '../context/NotflixContext.jsx';
+import Hero from '../components/Hero.jsx';
+import MediaRow from '../components/MediaRow.jsx';
+import MediaCard from '../components/MediaCard.jsx';
+import FocusButton from '../components/FocusButton.jsx';
+
+export default function BrowsePage({page,onInfo,onPlay}){
+  const{catalog,customTitles,myList,progress,injected}=useNotflix();const[genre,setGenre]=useState('All');
+  useEffect(()=>setGenre('All'),[page]);
+  const genres=useMemo(()=>['All',...new Set(catalog.flatMap((item)=>item.genres))].slice(0,18),[catalog]);
+  const hero=useMemo(()=>{if(injected.length)return catalog.find((item)=>item.id===injected[0])??catalog[0];if(page==='TV Shows')return catalog.find((item)=>item.type==='show')??catalog[0];if(page==='Movies')return catalog.find((item)=>item.type==='movie'&&item.featured)??catalog.find((item)=>item.type==='movie');return catalog.find((item)=>item.featured)??catalog[0];},[catalog,page,injected]);
+  if(page==='My List'){const items=myList.map((id)=>catalog.find((x)=>x.id===id)).filter(Boolean);return <main className="library-page page-shell"><div className="library-page__heading"><span className="eyebrow">YOUR LIBRARY</span><h1>My List</h1><p>{items.length} title{items.length===1?'':'s'} saved for later, assuming later ever actually arrives.</p></div>{items.length?<div className="library-grid">{items.map((item)=><MediaCard key={item.id} item={item} progressValue={progress[item.id]??0} onInfo={onInfo} onPlay={onPlay}/>)}</div>:<div className="empty-state"><h2>Your list is empty</h2><p>Add a few terrible cinematic decisions from the home screen.</p></div>}</main>;}
+  if(page!=='Home'){const predicate=navFilters[page]??(()=>true);const items=catalog.filter(predicate).filter((item)=>genre==='All'||item.genres.includes(genre));return <main className="genre-page page-shell"><section className="compact-hero"><div className="eyebrow">NOTFLIX COLLECTION</div><h1>{page}</h1><p>{page==='TV Shows'?'Series built for “one more episode” becoming an administrative problem.':page==='Movies'?'Original parody movies, fake blockbusters, and terrible decisions in widescreen.':'New releases, trending disasters, and the titles the algorithm has decided everyone must see.'}</p></section><div className="genre-chips" role="toolbar" aria-label="Genre filter">{genres.map((name)=><FocusButton key={name} className={`genre-chip ${genre===name?'genre-chip--active':''}`} onClick={()=>setGenre(name)}>{name}</FocusButton>)}</div>{items.length?<div className="library-grid">{items.map((item)=><MediaCard key={item.id} item={item} progressValue={progress[item.id]??0} onInfo={onInfo} onPlay={onPlay}/>)}</div>:<div className="empty-state"><h2>No titles in this filter</h2><p>Even NOTFLIX can only manufacture so much cinema at once.</p></div>}</main>;}
+  return <main className="browse-page"><Hero item={hero} onPlay={onPlay} onInfo={onInfo}/><div className="rows-stack">{customTitles.length>0&&<MediaRow row={{id:'custom',title:'Fresh from NOTFLIX HQ',ids:customTitles.map((x)=>x.id)}} onInfo={onInfo} onPlay={onPlay}/>} {baseRows.map((row)=><MediaRow key={row.id} row={row} onInfo={onInfo} onPlay={onPlay}/>)}</div><footer className="site-footer"><strong>NOTFLIX</strong><span>Parody streaming experience · Original or properly licensed media only.</span><span>TV-first, remote-friendly, offline-capable, and entirely too committed to the bit.</span></footer></main>;
+}

@@ -1,0 +1,24 @@
+name: NOTFLIX CI
+
+on:
+  push:
+    branches: [main, build/notflix-v1]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Validate support scripts
+        run: |
+          node --check server/control-server.mjs
+          bash -n scripts/pi/start-notflix.sh
+          bash -n scripts/pi/cec-remote.sh
+      - run: npm test
+      - run: npm run build

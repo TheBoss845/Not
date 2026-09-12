@@ -1,0 +1,10 @@
+{
+  "name":"NOTFLIX TV",
+  "short_name":"NOTFLIX",
+  "description":"A TV-first parody streaming experience.",
+  "start_url":"/?skipBoot=0",
+  "display":"standalone",
+  "background_color":"#050505",
+  "theme_color":"#050505",
+  "icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

@@ -1,0 +1,3 @@
+import React from 'react';
+import Brand from './Brand.jsx';
+export default class ErrorBoundary extends React.Component{constructor(props){super(props);this.state={error:null};}static getDerivedStateFromError(error){return{error};}componentDidCatch(error,info){console.error('NOTFLIX crashed',error,info);}render(){if(!this.state.error)return this.props.children;return <main className="fatal-screen"><Brand/><h1>NOTFLIX tripped over a cable.</h1><p>The app hit an unexpected error. Your watch progress is stored locally, so civilization can continue.</p><button onClick={()=>location.reload()}>Reload NOTFLIX</button><details><summary>Technical details</summary><pre>{String(this.state.error?.message||this.state.error)}</pre></details></main>;}}
