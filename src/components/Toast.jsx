@@ -1,0 +1,1 @@
+import React from 'react'; import {CheckCircle2} from 'lucide-react'; import {useNotflix} from '../context/NotflixContext.jsx'; export default function Toast(){const{toast}=useNotflix();if(!toast)return null;return <div className="toast" role="status"><CheckCircle2 size={18}/>{toast.message}</div>;}

@@ -1,43 +1,39 @@
 # NOTFLIX
 
-A TV-first parody streaming experience built for original comedy trailers, fake catalog entries, and interactive prank moments.
+A TV-first parody streaming platform for original comedy trailers, fake catalog entries, custom episodes, and interactive prank moments.
 
-## Current build
+## Implemented
 
-- Profile picker
-- Cinematic home hero
-- Horizontal streaming rows
-- Continue Watching progress
-- Top 10 presentation
-- Search
-- Movie detail modal
-- Full-screen mock player
-- Keyboard/remote-friendly controls
-- Premium Pause prank trigger
-- Hidden prank control room (`Shift + P` or the subtle settings button)
-- Responsive TV, desktop, tablet, and mobile layouts
+- cinematic boot sequence and profile picker
+- persistent profiles, My List, Continue Watching, watch progress, history, settings, and notifications
+- Home, TV Shows, Movies, New & Popular, and My List views
+- large parody catalog with movies and multi-season shows
+- Top 10, New Releases, recommendations, genre rows, and injected titles
+- delayed expanding cards and keyboard/TV focus navigation
+- title detail experience with seasons, episodes, metadata, recommendations, and play controls
+- fullscreen player with play/pause, seek, mute, subtitles, progress, fullscreen, and autoplay-next
+- support for real media URLs plus cinematic simulated playback while media is still being produced
+- search overlay
+- Premium Pause, Premium Rewind, fake buffering, fake errors, subtitle jokes, and reveal pranks
+- NOTFLIX HQ control room
+- local BroadcastChannel control plus optional WebSocket relay for another device
+- PWA shell and Raspberry Pi kiosk starter
 
-## Run locally
+## Run
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Build
+Optional control relay:
 
 ```bash
-npm run build
+NOTFLIX_CONTROL_TOKEN=choose-a-token npm run control
 ```
 
-## Next phases
+Open HQ with `/?mode=hq&skipBoot=1` or press `Shift + P`.
 
-1. Replace temporary generated-gradient artwork with original posters and trailers.
-2. Add real media playback and per-title media manifests.
-3. Add persistent profile/watch history.
-4. Add Raspberry Pi kiosk and HDMI-CEC remote support.
-5. Split the prank controller into a separate authenticated control surface.
-6. Add WebSocket events so the controller can trigger TV effects live.
-7. Expand the parody catalog and custom episode system.
+## Media rule
 
-> NOTFLIX is a parody project. Use original or properly licensed media rather than redistributing copyrighted movies.
+Use original, licensed, or otherwise permitted media. This project is for a parody streaming experience, not redistributing copyrighted movies.
