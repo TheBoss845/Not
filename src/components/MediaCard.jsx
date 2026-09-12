@@ -5,11 +5,11 @@ import FocusButton from './FocusButton.jsx';
 import Artwork from './Artwork.jsx';
 
 export default function MediaCard({item,rank,progressValue=0,onInfo,onPlay}){
-  const{myList,toggleMyList,settings}=useNotflix();
+  const{myList,toggleMyList,settings,profile}=useNotflix();
   const[expanded,setExpanded]=useState(false);const timer=useRef(null);const inList=myList.includes(item.id);
   const startExpand=()=>{clearTimeout(timer.current);timer.current=setTimeout(()=>setExpanded(true),380);};
   const stopExpand=()=>{clearTimeout(timer.current);timer.current=setTimeout(()=>setExpanded(false),110);};
-  const showVideo=expanded&&settings.autoplayPreviews&&item.media?.trailer;
+  const showVideo=expanded&&settings.autoplayPreviews&&profile?.autoplay!==false&&item.media?.trailer;
   return <article className={`media-card-wrap ${rank?'media-card-wrap--ranked':''}`} data-title-id={item.id}>{rank&&<div className="rank-number">{rank}</div>}<div className={`media-card ${expanded?'media-card--expanded':''}`} onMouseEnter={startExpand} onMouseLeave={stopExpand} onFocusCapture={startExpand} onBlurCapture={stopExpand}>
     <FocusButton className="media-card__art" onClick={()=>onInfo(item)} aria-label={`${item.title}, more info`}>
       <Artwork item={item} variant="card" previewing={expanded}/>
