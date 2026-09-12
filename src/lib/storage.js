@@ -29,3 +29,11 @@ export function exportState() {
   }
   return state;
 }
+
+export function importState(state) {
+  if (!state || typeof state !== 'object' || Array.isArray(state)) throw new Error('Invalid NOTFLIX backup');
+  const entries = Object.entries(state).filter(([key]) => typeof key === 'string' && key.length <= 120);
+  if (!entries.length) throw new Error('Backup contains no NOTFLIX data');
+  for (const [key, value] of entries) saveJSON(key, value);
+  return entries.length;
+}
