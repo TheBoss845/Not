@@ -5,28 +5,50 @@ import {loadJSON,saveJSON} from '../lib/storage.js';
 import {controlBus} from '../lib/controlBus.js';
 import {PRANKS} from '../lib/prankEngine.js';
 import {makeCustomTitle} from '../lib/titleFactory.js';
+import {applyProfilePolicy,canonicalProfileId} from '../lib/profilePolicy.js';
 
 const NotflixContext=createContext(null);
 const defaultSettings={autoplayPreviews:true,autoplayNext:true,subtitles:true,subtitleSize:'medium',reduceMotion:false,soundEffects:true,maturity:'all',defaultPlaybackRate:1};
 const starterProgress={'pop':.38,'no-weigh-home':.71,'mission-mildly-inconvenient':.22,'titan-ish':.53};
-const starterLists={levi:['pop','gums','bigger-things'],friend:['pop'],guest:['gums'],kids:['pop','outside-in']};
+const starterLists={levi:['pop','gums','bigger-things'],shaun:['pop'],lisa:['gums'],kids:['pop','outside-in']};
 const defaultPrankState={recommendationRow:null,ghostProgress:{},matchMode:null,fakePlan:null,customSubtitle:null,qualityMode:null,serviceNotice:null,stillWatching:false,lastEffect:null};
 const newProfileData=(id)=>({myList:starterLists[id]??[],progress:id==='levi'?starterProgress:{},history:[],ratings:{}});
 const ratingRank={'G':0,'TV-Y':0,'TV-Y7':0,'TV-G':0,'PG':1,'TV-PG':1,'PG-13':2,'TV-14':2,'R':3,'TV-MA':3,'NC-17':4};
 const maturityLimit={pg:1,pg13:2,all:99};
 const allowedForProfile=(item,profile)=>!profile||profile.maturity==='all'||(ratingRank[item.rating]??2)<=(maturityLimit[profile.maturity]??99);
 
-function loadProfileData(){const saved=loadJSON('profileData',null);if(saved&&typeof saved==='object')return saved;const active=loadJSON('activeProfile',null);if(!active)return{};return{[active]:{myList:loadJSON('myList',starterLists[active]??[]),progress:loadJSON('progress',active==='levi'?starterProgress:{}),history:loadJSON('history',[]),ratings:loadJSON('ratings',{})}};}
+function normalizeProfiles(saved){
+  const source=Array.isArray(saved)?saved:defaultProfiles;
+  const byId=new Map();
+  for(const raw of source){const normalized=applyProfilePolicy(raw);if(normalized?.id)byId.set(normalized.id,{...(byId.get(normalized.id)||{}),...normalized});}
+  for(const base of defaultProfiles){const existing=byId.get(base.id);byId.set(base.id,applyProfilePolicy({...base,...existing}));}
+  const fixedIds=new Set(defaultProfiles.map((profile)=>profile.id));
+  return [...defaultProfiles.map((profile)=>byId.get(profile.id)),...[...byId.values()].filter((profile)=>!fixedIds.has(profile.id))];
+}
+function migrateProfileData(saved){
+  if(!saved||typeof saved!=='object')return{};
+  const next={};
+  for(const[rawId,data]of Object.entries(saved)){const id=canonicalProfileId(rawId);next[id]={...(next[id]||{}),...(data||{})};}
+  return next;
+}
+function loadProfileData(){
+  const saved=loadJSON('profileData',null);
+  if(saved&&typeof saved==='object')return migrateProfileData(saved);
+  const active=canonicalProfileId(loadJSON('activeProfile',null));
+  if(!active)return{};
+  return{[active]:{myList:loadJSON('myList',starterLists[active]??[]),progress:loadJSON('progress',active==='levi'?starterProgress:{}),history:loadJSON('history',[]),ratings:loadJSON('ratings',{})}};
+}
 function mergeContent(item,override){if(!override)return item;return{...item,...override,media:{...(item.media||{}),...(override.media||{})},pranks:{...(item.pranks||{}),...(override.pranks||{})}};}
 function fakeMatchFor(item,mode){if(mode!=='impossible')return item.match;const seed=[...(item.id||item.title||'')].reduce((n,ch)=>(n*33+ch.charCodeAt(0))>>>0,7);return 101+(seed%38);}
 
 export function NotflixProvider({children}){
-  const[profiles,setProfiles]=useState(()=>loadJSON('profiles',defaultProfiles));const[profileId,setProfileId]=useState(()=>loadJSON('activeProfile',null));const[settings,setSettings]=useState(()=>loadJSON('settings',defaultSettings));const[profileData,setProfileData]=useState(loadProfileData);
+  const[profiles,setProfilesState]=useState(()=>normalizeProfiles(loadJSON('profiles',defaultProfiles)));const[profileId,setProfileId]=useState(()=>canonicalProfileId(loadJSON('activeProfile',null)));const[settings,setSettings]=useState(()=>loadJSON('settings',defaultSettings));const[profileData,setProfileData]=useState(loadProfileData);
   const[notifications,setNotifications]=useState(()=>loadJSON('notifications',[{id:'n1',title:'New episode',body:'BIGGER THINGS has an episode nobody remembers ordering.',read:false,at:Date.now()-3600000},{id:'n2',title:'Because apparently',body:'GUMS 2: DENTAL PLAN is now streaming.',read:false,at:Date.now()-7200000}]));
   const[prank,setPrank]=useState(null);const[prankState,setPrankState]=useState(()=>loadJSON('prankState',defaultPrankState));const[toast,setToast]=useState(null);const[remoteState,setRemoteState]=useState({connected:false,lastCommand:null});const[viewerTelemetry,setViewerTelemetry]=useState(null);const[injected,setInjected]=useState(()=>loadJSON('injected',[]));const[customTitles,setCustomTitles]=useState(()=>loadJSON('customTitles',[]));const[contentOverrides,setContentOverrides]=useState(()=>loadJSON('contentOverrides',{}));const[ruleOverrides,setRuleOverrides]=useState(()=>loadJSON('ruleOverrides',{}));const[sessionEvents,setSessionEvents]=useState(()=>loadJSON('sessionEvents',[]));
   const isHQController=useMemo(()=>new URLSearchParams(window.location.search).get('mode')==='hq',[]);
   const profile=profiles.find((p)=>p.id===profileId)??null;const activeData=profileId?(profileData[profileId]??newProfileData(profileId)):newProfileData('anonymous');const myList=activeData.myList??[];const progress=activeData.progress??{};const history=activeData.history??[];const ratings=activeData.ratings??{};
 
+  const setProfiles=useCallback((updater)=>setProfilesState((prev)=>normalizeProfiles(typeof updater==='function'?updater(prev):updater)),[]);
   useEffect(()=>saveJSON('profiles',profiles),[profiles]);useEffect(()=>saveJSON('activeProfile',profileId),[profileId]);useEffect(()=>saveJSON('settings',settings),[settings]);useEffect(()=>saveJSON('profileData',profileData),[profileData]);useEffect(()=>saveJSON('notifications',notifications),[notifications]);useEffect(()=>saveJSON('injected',injected),[injected]);useEffect(()=>saveJSON('customTitles',customTitles),[customTitles]);useEffect(()=>saveJSON('contentOverrides',contentOverrides),[contentOverrides]);useEffect(()=>saveJSON('ruleOverrides',ruleOverrides),[ruleOverrides]);useEffect(()=>saveJSON('sessionEvents',sessionEvents.slice(0,80)),[sessionEvents]);useEffect(()=>saveJSON('prankState',prankState),[prankState]);
 
   const patchProfile=useCallback((updater)=>{if(!profileId)return;setProfileData((prev)=>{const current=prev[profileId]??newProfileData(profileId);const next=typeof updater==='function'?updater(current):{...current,...updater};return{...prev,[profileId]:next};});},[profileId]);
@@ -81,7 +103,7 @@ export function NotflixProvider({children}){
 
   const effectiveCatalog=useMemo(()=>[...customTitles,...baseCatalog].map((item)=>{const withContent=mergeContent(item,contentOverrides[item.id]);return ruleOverrides[item.id]?{...withContent,pranks:{...(withContent.pranks||{}),...ruleOverrides[item.id]}}:withContent;}),[customTitles,contentOverrides,ruleOverrides]);
   const visibleCatalog=useMemo(()=>{const permitted=effectiveCatalog.filter((item)=>allowedForProfile(item,profile));const map=new Map(permitted.map((x)=>[x.id,x]));const injectedItems=injected.map((id)=>map.get(id)).filter(Boolean);return[...injectedItems,...permitted.filter((item)=>!injected.includes(item.id))];},[effectiveCatalog,injected,profile]);
-  const selectProfile=useCallback((id)=>{setProfileData((prev)=>prev[id]?prev:{...prev,[id]:newProfileData(id)});setProfileId(id);},[]);
+  const selectProfile=useCallback((rawId)=>{const id=canonicalProfileId(rawId);setProfileData((prev)=>prev[id]?prev:{...prev,[id]:newProfileData(id)});setProfileId(id);},[]);
   const displayMatchFor=useCallback((item)=>fakeMatchFor(item,prankState.matchMode),[prankState.matchMode]);
   const value={catalog:visibleCatalog,baseCatalog,customTitles,createCustomTitle,removeCustomTitle,contentOverrides,updateTitleContent,clearTitleContent,profiles,setProfiles,profile,profileId,selectProfile,signOutProfile:()=>setProfileId(null),settings,setSettings,myList,toggleMyList,progress,saveProgress,history,notifications,markNotificationRead:(id)=>setNotifications((prev)=>prev.map((n)=>n.id===id?{...n,read:true}:n)),clearNotifications:()=>setNotifications([]),prank,triggerPrank,closePrank:()=>setPrank(null),prankState,clearPrankEffect,resetPrankEffects,displayMatchFor,toast,notify,remoteState,viewerTelemetry,injected,injectTitle,ruleOverrides,saveRuleOverride,clearRuleOverride,ratings,rateTitle,sessionEvents,recordEvent,resetViewingData,findTitle};
   return <NotflixContext.Provider value={value}>{children}</NotflixContext.Provider>;
