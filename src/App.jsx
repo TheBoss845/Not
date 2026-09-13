@@ -1,6 +1,7 @@
 import React,{useCallback,useEffect,useMemo,useState} from 'react';
 import {useNotflix} from './context/NotflixContext.jsx';
 import {useSpatialNavigation} from './hooks/useSpatialNavigation.js';
+import {useUiSounds} from './hooks/useUiSounds.js';
 import LoadingSplash from './components/LoadingSplash.jsx';
 import ProfilePicker from './components/ProfilePicker.jsx';
 import NavBar from './components/NavBar.jsx';
@@ -24,14 +25,15 @@ export default function App(){
   const[search,setSearch]=useState(false);
   const[settingsOpen,setSettingsOpen]=useState(false);
   const[hq,setHq]=useState(params.get('mode')==='hq');
-  useSpatialNavigation(!booting&&!player);
+  useSpatialNavigation(!booting);
+  useUiSounds(!booting&&settings.soundEffects);
 
-  const syncUrl=useCallback((updates={})=>{const url=new URL(window.location.href);for(const[key,value]of Object.entries(updates)){if(value===null||value===undefined||value==='')url.searchParams.delete(key);else url.searchParams.set(key,String(value));}window.history.replaceState({},'',url);},[]);
+  const syncUrl=useCallback((updates={})=>{const url=new URL(window.location.href);for(const[key,value]of Object.entries(updates)){if(value===null||value===undefined||value==='')url.searchParams.delete(key);else url.searchParams.set(key,String(value));}history.replaceState({},'',url);},[]);
   const navigate=useCallback((next)=>{setPage(next);syncUrl({page:next==='Home'?null:next});window.scrollTo({top:0,behavior:settings.reduceMotion?'auto':'smooth'});},[settings.reduceMotion,syncUrl]);
   const openInfo=useCallback((item)=>{setSearch(false);setSelected(item);syncUrl({title:item.id});},[syncUrl]);
   const openPlayer=useCallback((item,episode=null,options={})=>{const returnToDetails=selected?.id===item.id;setSelected(null);setSearch(false);setPlayer({item,episode,returnToDetails,...options});syncUrl({title:null});},[selected,syncUrl]);
   const closePlayer=useCallback(()=>{const current=player;setPlayer(null);if(current?.returnToDetails){setSelected(current.item);syncUrl({title:current.item.id});}},[player,syncUrl]);
-  const closeTopLayer=useCallback(()=>{if(hq){setHq(false);syncUrl({mode:null});return;}if(settingsOpen){setSettingsOpen(false);return;}if(search){setSearch(false);return;}if(selected){setSelected(null);syncUrl({title:null});return;}if(player)closePlayer();},[hq,settingsOpen,search,selected,player,closePlayer,syncUrl]);
+  const closeTopLayer=useCallback(()=>{if(hq){setHq(false);syncUrl({mode:null});return;}if(settingsOpen)return setSettingsOpen(false);if(search)return setSearch(false);if(selected){setSelected(null);syncUrl({title:null});return;}if(player)return closePlayer();},[hq,settingsOpen,search,selected,player,closePlayer,syncUrl]);
 
   useEffect(()=>{const onBack=()=>closeTopLayer();const onHotkey=(event)=>{if(event.shiftKey&&event.key.toLowerCase()==='p'){event.preventDefault();setHq((value)=>{const next=!value;syncUrl({mode:next?'hq':null});return next;});}if(event.key==='/'&&!search&&!player){event.preventDefault();setSearch(true);}};const onRemoteNavigate=(event)=>{const destination=event.detail?.page;if(destination)navigate(destination);};window.addEventListener('notflix:back',onBack);window.addEventListener('keydown',onHotkey);window.addEventListener('notflix:remote-navigate',onRemoteNavigate);return()=>{window.removeEventListener('notflix:back',onBack);window.removeEventListener('keydown',onHotkey);window.removeEventListener('notflix:remote-navigate',onRemoteNavigate);};},[closeTopLayer,search,player,navigate,syncUrl]);
   useEffect(()=>{document.documentElement.dataset.reduceMotion=settings.reduceMotion?'true':'false';},[settings.reduceMotion]);
