@@ -1,9 +1,11 @@
 # NOTFLIX status
 
-Platform: operational
+Platform: feature-complete
 
-Current milestone: v0.5
+Current milestone: v1.0
 
-The viewer app, playback stack, profiles, persistent viewing state, TV navigation, HQ controller, prank engine, Catalog Studio, Series Studio, media override pipeline, offline shell, Raspberry Pi kiosk support, cross-device HQ synchronization, personalized recommendations, interface sound feedback, and system-health dashboard are implemented.
+The viewer app, profiles, persistent viewing state, personalized recommendations, TV navigation, playback stack, generated full-runtime motion cuts, generated trailers, generated poster/backdrop art, interface audio, HQ controller, prank engine, Catalog Studio, Series Studio, media override pipeline, offline shell, Raspberry Pi kiosk support, cross-device HQ synchronization, and system-health dashboard are implemented.
 
-The largest remaining work is content production: finished posters, backdrops, trailers, and original/authorized full films for the catalog. The application deliberately uses polished procedural artwork and simulated playback when those assets are not available yet.
+Every catalog title is playable even when no external media file exists. Original generated SVG artwork fills poster/backdrop gaps and the NOTFLIX Motion engine supplies trailer and feature playback using the title's real catalog runtime. Any custom/authorized media uploaded through the studio automatically replaces the generated fallback.
+
+The application is therefore no longer blocked on content production. Additional handcrafted films, trailers, posters, music, and voice work are optional quality upgrades rather than missing platform functionality.
