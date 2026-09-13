@@ -7,7 +7,8 @@ export default function MotionReel({item,episode=null,trailer=false,progress=0,p
   const scenes=useMemo(()=>storyboardFor(item,episode,trailer),[item,episode,trailer]);
   const palette=useMemo(()=>paletteFor({...item,id:episode?`${item.id}:${episode.id}`:item.id,tone:episode?.tone??item.tone}),[item,episode]);
   const effective=preview?loop:Math.max(0,Math.min(1,progress));
-  const index=Math.min(scenes.length-1,Math.floor((effective>=1?.999999:effective)*scenes.length));
+  const safeProgress=effective>=1?.999999:effective;
+  const index=Math.min(scenes.length-1,Math.floor(safeProgress*scenes.length));
   const scene=scenes[index]??scenes[0];
   const sceneProgress=(effective*scenes.length)%1;
   return <div className={`motion-reel ${preview?'motion-reel--preview':''} ${trailer?'motion-reel--trailer':''}`} style={{'--reel-a':palette.a,'--reel-b':palette.b,'--reel-c':palette.c,'--reel-glow':palette.glow,'--scene-progress':sceneProgress}}>
