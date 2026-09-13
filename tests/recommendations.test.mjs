@@ -12,12 +12,12 @@ const catalog=[
 test('becauseYouWatched uses the latest history title as the seed',()=>{
   const result=becauseYouWatched(catalog,{history:[{id:'a',at:20,progress:.5}],progress:{a:.5}});
   assert.equal(result.seed.id,'a');
-  assert.deepEqual(result.items.map((item)=>item.id),['b','d']);
+  assert.deepEqual(result.items.map((item)=>item.id),['d','b']);
 });
 
-test('topPicksForYou favors genres the profile liked',()=>{
+test('topPicksForYou favors the strongest genre overlap',()=>{
   const result=topPicksForYou(catalog,{ratings:{a:'up'},progress:{a:.4}},3);
-  assert.deepEqual(result.map((item)=>item.id),['b','d','c']);
+  assert.deepEqual(result.map((item)=>item.id),['d','b','c']);
 });
 
 test('watchAgain returns completed titles most-recent first',()=>{
