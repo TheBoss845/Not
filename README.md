@@ -1,20 +1,20 @@
 # NOTFLIX
 
-A TV-first parody streaming platform for original comedy trailers, fake catalog entries, generated short films, and interactive prank moments on devices you are allowed to use.
+A TV-first parody streaming platform for original comedy titles, generated cinematic media, custom films, interactive prank moments, and a remote HQ controller on devices you are allowed to use.
 
 ## Platform status
 
-NOTFLIX v0.4 includes a cinematic boot experience; full profile management with profile-specific My List, viewing progress, history and ratings; maturity-filtered profiles; Home / Movies / TV / New & Popular / My List surfaces; search and notifications; Continue Watching, Top 10 and recommendation rows; genre filtering; title details; seasons and episodes; autoplay previews; real-media and simulated playback; captions; playback speed; skip-intro support; autoplay-next; keyboard/TV navigation; offline shell; crash recovery; local backup export/restore; and persistent settings.
+NOTFLIX v1.0 is feature-complete as a streaming experience. It includes a cinematic boot experience; profile-specific My List, viewing progress, history and ratings; maturity-filtered profiles; Home / Movies / TV / New & Popular / My List surfaces; search and notifications; Continue Watching, Top 10, Watch It Again and personalized recommendation rows; genre filtering; title details; seasons and episodes; autoplay previews; captions; playback speed; skip-intro support; autoplay-next; keyboard/TV navigation; offline shell; crash recovery; local backup export/restore; persistent settings; and generated interface audio.
 
-NOTFLIX HQ includes live playback telemetry, transport controls, instant prank triggers, catalog injection, an event log, a per-title Prank Rule Editor, and a Catalog Studio. Local tabs use BroadcastChannel; the optional token-protected WebSocket relay supports a phone/iPad controller and TV viewer on the same permitted setup.
+NOTFLIX HQ includes live playback telemetry, transport controls, instant prank triggers, catalog injection, an event log, a per-title Prank Rule Editor, Catalog Studio, Series Studio, and a System Health dashboard. Local tabs use BroadcastChannel; the optional token-protected WebSocket relay supports a phone/iPad controller and TV viewer on the same permitted setup.
 
-## Content and media pipeline
+## Complete media pipeline
 
-The built-in catalog is data-driven. Every title can provide `media.source`, `media.trailer`, `media.poster`, `media.backdrop`, WebVTT subtitle tracks, and an intro endpoint. Catalog Studio can attach or replace those assets for any built-in or custom title without touching source code. It also reports how many titles currently have finished posters, backdrops, trailers and full films.
+Every title now has a complete media experience even before a custom asset is uploaded. NOTFLIX v1 generates original inline-SVG poster/backdrop artwork from title metadata and uses the NOTFLIX Motion engine to create deterministic trailer and full-runtime storyboards for every movie and episode. Expanded cards can autoplay generated previews, title pages always have a preview, and playback uses the catalog's real listed runtime so Continue Watching and remote telemetry behave like a real service.
 
-The Series / Episode Builder can add or replace episodes and entire new seasons on shows, including an episode video, subtitle track and intro timing. This is the system used for surprise/fake-episode style prank content.
+Custom media still takes priority. Any title can provide `media.source`, `media.trailer`, `media.poster`, `media.backdrop`, WebVTT subtitle tracks, and an intro endpoint. Catalog Studio can attach or replace those assets without touching source code. Series Studio can add or replace episodes and seasons with their own videos, subtitles and intro timing.
 
-If media is missing, NOTFLIX deliberately falls back to procedural original artwork and cinematic simulated playback so the catalog stays usable while films are being produced. Add original, generated, licensed, or otherwise permitted media only.
+The generated media layer is deliberately original and does not bundle copyrighted movie footage, music, posters, or dialogue. Add only original, generated, licensed, or otherwise permitted custom media.
 
 ## Prank system
 
@@ -33,7 +33,7 @@ npm run dev
 npm run check
 ```
 
-GitHub Actions also validates the relay server and Raspberry Pi shell scripts, runs the Node tests, and performs a production Vite build.
+GitHub Actions validates the relay server and Raspberry Pi shell scripts, runs the Node test suite, and performs a production Vite build.
 
 ## Raspberry Pi / TV
 
@@ -41,4 +41,4 @@ See `docs/PI_KIOSK.md`. The supplied kiosk starter launches Chromium fullscreen.
 
 ## Hidden control surface
 
-Open HQ with `?mode=hq` or press `Shift + P`. The normal viewer navigation does not expose HQ unless the URL explicitly includes `?admin=1`. Keep HQ on a device you control. The prank system is intended for harmless jokes, not secret access to somebody else’s hardware or accounts.
+Open HQ with `?mode=hq` or press `Shift + P`. Keep HQ on a device you control. The prank system is intended for harmless jokes, not secret access to somebody else’s hardware or accounts.
