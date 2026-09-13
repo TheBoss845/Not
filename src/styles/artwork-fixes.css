@@ -1,0 +1,13 @@
+.artwork--curated .artwork__wash{opacity:.12;background:linear-gradient(0deg,rgba(0,0,0,.2),transparent 52%)}
+.artwork--curated .artwork__beam{display:none}
+.artwork--curated .artwork__grain{opacity:.025}
+.artwork--curated .artwork__image--primary{object-position:var(--art-focus,50% 50%)}
+.artwork[data-art-layout="portrait-crop"] .artwork__image--primary{object-fit:cover;object-position:var(--art-focus,50% 40%);transform:scale(1.015)}
+.artwork[data-art-layout="portrait-fallback"]{background:#090909}
+.artwork[data-art-layout="portrait-fallback"] .artwork__image--ambient{object-fit:cover;object-position:var(--art-focus,50% 38%);filter:blur(26px) brightness(.44) saturate(.95);transform:scale(1.14);opacity:.9}
+.artwork[data-art-layout="portrait-fallback"] .artwork__image--primary{width:min(56%,560px);height:108%;left:auto;right:6%;top:-4%;object-fit:contain;object-position:center center;filter:drop-shadow(-14px 0 34px rgba(0,0,0,.55))}
+.artwork--card[data-art-source="curated"]:after{background:linear-gradient(0deg,rgba(0,0,0,.58),transparent 48%)}
+.search-grid .media-card__art,.library-grid .media-card__art{background:#0b0b0b}
+.search-grid .media-card-wrap{max-width:460px}
+.search-grid .media-card__title{max-width:82%;text-shadow:0 2px 12px #000,0 1px 2px #000}
+@media(max-width:700px){.artwork[data-art-layout="portrait-fallback"] .artwork__image--primary{width:70%;right:-1%}.search-grid .media-card-wrap{max-width:none}}
