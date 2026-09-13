@@ -1,5 +1,6 @@
 import React from 'react';
 import { gradientFor } from '../data/catalog.js';
+import {coverFor} from '../data/coverArt.js';
 import {generatedArtworkUri} from '../lib/generatedMedia.js';
 
 function hash(text=''){
@@ -10,7 +11,10 @@ function hash(text=''){
 
 export default function Artwork({item,variant='card',className='',children,previewing=false}){
   if(!item)return null;
-  const customUrl=variant==='hero'||variant==='backdrop'?item.media?.backdrop:item.media?.poster;
+  const curated=coverFor(item.id);
+  const customUrl=variant==='hero'||variant==='backdrop'
+    ? item.media?.backdrop||curated?.backdrop
+    : item.media?.poster||curated?.poster;
   const artUrl=customUrl||generatedArtworkUri(item,variant);
   const seed=hash(item.id||item.title);
   const h1=seed%360;
@@ -19,7 +23,6 @@ export default function Artwork({item,variant='card',className='',children,previ
     <img className="artwork__image" src={artUrl} alt="" loading={variant==='card'?'lazy':'eager'}/>
     <span className="artwork__wash"/>
     {!customUrl&&<><span className="artwork__shape artwork__shape--a"/><span className="artwork__shape artwork__shape--b"/><span className="artwork__shape artwork__shape--c"/></>}
-    {customUrl&&<span className="artwork__emoji">{item.emoji}</span>}
     <span className="artwork__beam"/>
     <span className="artwork__grain"/>
     {children}
