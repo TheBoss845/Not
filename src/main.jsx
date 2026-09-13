@@ -10,6 +10,7 @@ import './styles/settings-extra.css';
 import './styles/studio-extra.css';
 import './styles/hq-health.css';
 import './styles/motion-reel.css';
+import './styles/prank-v2.css';
 
 if('serviceWorker' in navigator&&import.meta.env.PROD){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
 createRoot(document.getElementById('root')).render(<React.StrictMode><ErrorBoundary><NotflixProvider><App/></NotflixProvider></ErrorBoundary></React.StrictMode>);
